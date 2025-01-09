@@ -393,7 +393,6 @@ input:focus, textarea:focus, select:focus, button:focus {
 	bottom:0;
 	right:0;
 	z-index:-1;
-	background-color: #ff6f00;
 	-webkit-transition: all 0.5s;
     -moz-transition: all 0.5s;
     -ms-transition: all 0.5s;
@@ -403,7 +402,8 @@ input:focus, textarea:focus, select:focus, button:focus {
 .ast_menu ul li a:hover:after{
 	opacity:1;
 	visibility:visible;
-	background-color: #ff6f00;
+	/* background-color: #ff6f00; */
+    color: #ff6f00;
 	-webkit-transition: all 0.5s;
     -moz-transition: all 0.5s;
     -ms-transition: all 0.5s;

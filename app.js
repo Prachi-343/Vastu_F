@@ -1,27 +1,7 @@
-// Import Firebase services from firebaseConfig.js
-import { db, auth, storage } from "./firebaseConfig.js";
-import { 
-    collection, 
-    addDoc, 
-    getDocs, 
-    doc, 
-    setDoc,
-    deleteDoc, 
-    updateDoc 
-} from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js";
-import { 
-    createUserWithEmailAndPassword, 
-    signInWithEmailAndPassword, 
-    sendPasswordResetEmail, 
-    setPersistence, 
-    browserSessionPersistence, 
-    browserLocalPersistence 
-} from "https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js";
-import { 
-    ref, 
-    uploadBytes, 
-    getDownloadURL 
-} from "https://www.gstatic.com/firebasejs/10.6.0/firebase-storage.js";
+// Initialize Firebase services
+// const db = firebase.firestore();
+// const auth = firebase.auth();
+// const storage = firebase.storage();
 
 /**
  * Authentication Logic
@@ -30,26 +10,28 @@ import {
  * User Signup Logic
  */
 const signupForm = document.getElementById("signup-form");
-signupForm.addEventListener("submit", async (event) => {
+signupForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
-
-    const name = document.getElementById("signup-name").value;
-    const email = document.getElementById("signup-email").value;
+    const name = document.getElementById("signup-name").value.trim();
+    const email = document.getElementById("signup-email").value.trim();
     const password = document.getElementById("signup-password").value;
-    const mobile = document.getElementById("signup-mobile").value;
+    const mobile = document.getElementById("signup-mobile").value.trim();
     const gender = document.getElementById("signup-gender").value;
 
+    if (!name || !email || !password || !mobile || !gender) {
+        alert("Please fill in all required fields.");
+        return;
+    }
+
     try {
-        // Create user with email and password
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
         const user = userCredential.user;
 
-        // Store additional user data in Firestore
-        await setDoc(doc(db, "users", user.uid), {
+        await db.collection("users").doc(user.uid).set({
             name,
             email,
             mobile,
-            gender
+            gender,
         });
 
         alert("Signup successful! You can now log in.");
@@ -64,23 +46,26 @@ signupForm.addEventListener("submit", async (event) => {
  * User Login Logic
  */
 const loginForm = document.getElementById("login-form");
-loginForm.addEventListener("submit", async (event) => {
+loginForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
-
-    const email = document.getElementById("login-email").value;
+    const email = document.getElementById("login-email").value.trim();
     const password = document.getElementById("login-password").value;
     const rememberMe = document.getElementById("remember-me").checked;
 
+    if (!email || !password) {
+        alert("Please fill in all required fields.");
+        return;
+    }
+
     try {
-        // Set persistence based on "remember me" checkbox
-        const persistence = rememberMe ? browserLocalPersistence : browserSessionPersistence;
-        await setPersistence(auth, persistence);
+        const persistence = rememberMe
+            ? firebase.auth.Auth.Persistence.LOCAL
+            : firebase.auth.Auth.Persistence.SESSION;
 
-        // Sign in the user
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
+        await auth.setPersistence(persistence);
 
-        alert(`Welcome back, ${user.email}!`);
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        alert(`Welcome back, ${userCredential.user.email}!`);
         loginForm.reset();
     } catch (error) {
         console.error("Login error:", error.message);
@@ -92,12 +77,12 @@ loginForm.addEventListener("submit", async (event) => {
  * Forgot Password Logic
  */
 const forgotPassword = document.getElementById("forgot-password");
-forgotPassword.addEventListener("click", async () => {
+forgotPassword?.addEventListener("click", async () => {
     const email = prompt("Enter your email address for password reset:");
     if (!email) return;
 
     try {
-        await sendPasswordResetEmail(auth, email);
+        await auth.sendPasswordResetEmail(email);
         alert("Password reset email sent! Check your inbox.");
     } catch (error) {
         console.error("Password reset error:", error.message);
@@ -108,12 +93,12 @@ forgotPassword.addEventListener("click", async () => {
 /**
  * Navigation Between Forms
  */
-document.getElementById("go-to-signup").addEventListener("click", () => {
+document.getElementById("go-to-signup")?.addEventListener("click", () => {
     document.getElementById("login-dialog").style.display = "none";
     document.getElementById("signup-dialog").style.display = "block";
 });
 
-document.getElementById("go-to-login").addEventListener("click", () => {
+document.getElementById("go-to-login")?.addEventListener("click", () => {
     document.getElementById("signup-dialog").style.display = "none";
     document.getElementById("login-dialog").style.display = "block";
 });
@@ -121,14 +106,14 @@ document.getElementById("go-to-login").addEventListener("click", () => {
 /**
  * Blog Management
  */
-
-// Fetch and display all blogs
 const fetchBlogs = async () => {
     const blogsContainer = document.getElementById("blogs");
+    if (!blogsContainer) return;
+
     blogsContainer.innerHTML = ""; // Clear existing content
 
     try {
-        const querySnapshot = await getDocs(collection(db, "blogs"));
+        const querySnapshot = await db.collection("blogs").get();
         querySnapshot.forEach((doc) => {
             const blog = doc.data();
             blogsContainer.innerHTML += `
@@ -144,27 +129,17 @@ const fetchBlogs = async () => {
     }
 };
 
-// Add a new blog
-const addBlog = async (title, content, author) => {
-    try {
-        await addDoc(collection(db, "blogs"), { title, content, author });
-        alert("Blog added successfully!");
-    } catch (error) {
-        console.error("Error adding blog:", error.message);
-    }
-};
-
 /**
  * Product Management
  */
-
-// Fetch and display products
 const fetchProducts = async () => {
     const productsContainer = document.getElementById("products");
+    if (!productsContainer) return;
+
     productsContainer.innerHTML = ""; // Clear existing content
 
     try {
-        const querySnapshot = await getDocs(collection(db, "products"));
+        const querySnapshot = await db.collection("products").get();
         querySnapshot.forEach((doc) => {
             const product = doc.data();
             productsContainer.innerHTML += `
@@ -181,70 +156,10 @@ const fetchProducts = async () => {
     }
 };
 
-// Add a new product
-const addProduct = async (name, description, price, stock, file) => {
-    try {
-        // Upload product image
-        const storageRef = ref(storage, `products/${file.name}`);
-        await uploadBytes(storageRef, file);
-        const imageUrl = await getDownloadURL(storageRef);
-
-        // Add product details to Firestore
-        await addDoc(collection(db, "products"), { name, description, price, stock, imageUrl });
-        alert("Product added successfully!");
-    } catch (error) {
-        console.error("Error adding product:", error.message);
-    }
-};
-
-/**
- * Appointment Booking
- */
-
-// Fetch and display appointments
-const fetchAppointments = async () => {
-    const appointmentsContainer = document.getElementById("appointments");
-    appointmentsContainer.innerHTML = ""; // Clear existing content
-
-    try {
-        const querySnapshot = await getDocs(collection(db, "appointments"));
-        querySnapshot.forEach((doc) => {
-            const appointment = doc.data();
-            appointmentsContainer.innerHTML += `
-                <div class="appointment">
-                    <p>Date: ${appointment.date}</p>
-                    <p>Time: ${appointment.time}</p>
-                    <p>Status: ${appointment.status}</p>
-                </div>
-            `;
-        });
-    } catch (error) {
-        console.error("Error fetching appointments:", error.message);
-    }
-};
-
-// Book a new appointment
-const bookAppointment = async (date, time, userID) => {
-    try {
-        await addDoc(collection(db, "appointments"), { date, time, userID, status: "Pending" });
-        alert("Appointment booked successfully!");
-    } catch (error) {
-        console.error("Error booking appointment:", error.message);
-    }
-};
-
 /**
  * Event Listeners
- * Add your event listeners here for buttons in your HTML template.
  */
-
-// Example usage for login
-document.getElementById("loginButton").addEventListener("click", () => {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    logIn(email, password);
+document.addEventListener("DOMContentLoaded", () => {
+    fetchBlogs();
+    fetchProducts();
 });
-
-// Example usage for fetching blogs
-document.addEventListener("DOMContentLoaded", fetchBlogs);
-

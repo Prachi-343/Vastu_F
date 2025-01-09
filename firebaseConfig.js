@@ -1,27 +1,28 @@
-// Import the required Firebase services
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js";
-import { getStorage } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-storage.js";
+// firebaseConfig.js
 
-// Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyCgsZ_Fu80Yr-EWSgRKdNTjm9g0hMWF2QE",
-  authDomain: "urjasvi-aea0f.firebaseapp.com",
-  databaseURL: "https://urjasvi-aea0f-default-rtdb.firebaseio.com",
-  projectId: "urjasvi-aea0f",
-  storageBucket: "urjasvi-aea0f.firebasestorage.app",
-  messagingSenderId: "1055226138959",
-  appId: "1:1055226138959:web:b5c5178429f2eb118eb53a"
-};
+// Ensure the Firebase object is available globally
+if (typeof firebase === "undefined") {
+  console.error("Firebase SDK not loaded. Ensure Firebase scripts are included in the correct order.");
+} else {
+  console.log("Firebase object:", firebase);
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+  // Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyCgsZ_Fu80Yr-EWSgRKdNTjm9g0hMWF2QE",
+    authDomain: "urjasvi-aea0f.firebaseapp.com",
+    databaseURL: "https://urjasvi-aea0f-default-rtdb.firebaseio.com",
+    projectId: "urjasvi-aea0f",
+    storageBucket: "urjasvi-aea0f.firebasestorage.app",
+    messagingSenderId: "1055226138959",
+    appId: "1:1055226138959:web:b5c5178429f2eb118eb53a"
+  };
 
-// Initialize services
-const db = getFirestore(app); // Firestore database
-const auth = getAuth(app);    // Authentication
-const storage = getStorage(app); // Storage for file uploads
+  // Initialize Firebase
+  const app = firebase.initializeApp(firebaseConfig);
+  console.log("Firebase initialized:", app);
 
-// Export services for use in other files
-export { db, auth, storage };
+  // Initialize Firebase services (example)
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const storage = firebase.storage();
+}
