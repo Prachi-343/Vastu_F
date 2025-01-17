@@ -1214,6 +1214,9 @@ input:focus, textarea:focus, select:focus, button:focus {
 	text-align:left;
 	margin:10px 0px;
 }
+
+
+
 /*---------- We Do css end -------*/
 /*---------- Timer css start -------*/
 .ast_timer_wrapper{
@@ -1292,7 +1295,7 @@ input:focus, textarea:focus, select:focus, button:focus {
 }
 /*---------- Timer css end -------*/
 /*---------- Packages css start -------*/
-.ast_packages_wrapper{
+/* .ast_packages_wrapper{
 	float:left;
 	width:100%;
 	background-color:#f4f4f4;
@@ -1463,10 +1466,36 @@ input:focus, textarea:focus, select:focus, button:focus {
 }
 .ast_packages_box.active .ast_price p{
 	color: #ffffff;
-}
+} */
 
 
 /*---------- Packages css end -------*/
+
+/* youtube video css start */
+
+.video-container {
+    max-height: 400;
+    width: 100%; /* Set the width of the container (adjust as needed) */
+    max-width: 100%; /* Maximum width for larger screens */
+    margin:0; /* Center the container horizontally and add vertical margin */
+    background-color: #fff; /* White background for the margins */
+    padding:40px; /* Add padding around the video */
+    box-sizing: border-box; /* Include padding in the container's width calculation */
+    border-radius: 10px; /* Optional: Add rounded corners to the container */
+  }
+  
+  iframe {
+    width: 50%;
+    height: 400px; /* Set a fixed height for the video */
+    border-radius: 8px;
+    justify-content: center;/* Optional: Rounded corners for the video */
+    align-items: center;
+    margin-left: 350px;
+    margin-top: 40px;
+  }
+  
+
+/* youtube video css end */
 /*---------- Horoscope css start -------*/
 .ast_horoscope_wrapper{
 	float:left;
