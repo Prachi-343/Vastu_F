@@ -1215,7 +1215,16 @@ input:focus, textarea:focus, select:focus, button:focus {
 	margin:10px 0px;
 }
 
-
+.Ap-link {
+    text-decoration: none; 
+    color: #777777; 
+  }
+  
+  .Ap-link:hover {
+    color: blue; 
+    text-decoration: 
+}
+  
 
 /*---------- We Do css end -------*/
 /*---------- Timer css start -------*/
